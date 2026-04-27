@@ -1,8 +1,22 @@
 #!/bin/bash
 set -ex
 
-if [[ "$cuda_compiler_version" == "None" ]]; then
+if [[ "${hip_compiler_version:-None}" != "None" ]]; then
+  export USE_ROCM=1
+  export USE_CUDA=0
+  export ROCM_PATH="${BUILD_PREFIX}"
+  export ROCM_HOME="${BUILD_PREFIX}"
+  export HIP_PATH="${BUILD_PREFIX}"
+  export HIP_ROOT_DIR="${BUILD_PREFIX}"
+  if [[ -n "${ROCK_THE_CONDA_ROCM_GPU_TARGETS:-}" ]]; then
+    export PYTORCH_ROCM_ARCH="${ROCK_THE_CONDA_ROCM_GPU_TARGETS}"
+  fi
+  echo "PYTORCH_ROCM_ARCH is set to ${PYTORCH_ROCM_ARCH:-<unset>}"
+  export FORCE_CUDA=1
+  export TORCHVISION_USE_NVJPEG=0
+elif [[ "$cuda_compiler_version" == "None" ]]; then
   export FORCE_CUDA=0
+  export TORCHVISION_USE_NVJPEG=0
 else
   export CUDA_TOOLKIT_ROOT_DIR="${PREFIX}"
   if [[ "${arm_variant_type:-}" == "tegra" ]]; then
@@ -21,6 +35,7 @@ else
   fi
   echo "TORCH_CUDA_ARCH_LIST is set to ${TORCH_CUDA_ARCH_LIST}"
   export FORCE_CUDA=1
+  export TORCHVISION_USE_NVJPEG=1
 fi
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
@@ -38,7 +53,6 @@ rm -rf torchvision/csrc/io/image/cpu/giflib
 # hmaarrfk I found that it was pretty buggy:
 # https://github.com/conda-forge/torchvision-feedstock/pull/60
 export TORCHVISION_USE_FFMPEG=0
-export TORCHVISION_USE_NVJPEG=${FORCE_CUDA}
 export TORCHVISION_INCLUDE="${PREFIX}/include/"
 
 # disabled by default but with a TODO to "enable by default"
