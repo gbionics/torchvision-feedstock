@@ -1,6 +1,6 @@
 context:
   version: "0.26.0"
-  build_number: 1
+  build_number: 2
   # see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion
   # torchvision requires that GPU backend versions match with pytorch
   # https://github.com/pytorch/vision/blob/fa99a5360fbcd1683311d57a76fcc0e7323a4c1e/torchvision/extension.py#L79C1-L85C1
@@ -87,8 +87,22 @@ outputs:
         - if: hip_compiler_version != "None"
           then:
             - rocm-core ${{ hip_compiler_version }}.*
-            - libhipblas-common-devel
+            # Development dependencies for Torch CMake configuration and extensions.
+            - hip-devel
+            - librocblas-devel
+            - librocsolver-devel
+            - librocrand-devel
             - librocprim-devel
+            - librocthrust-devel
+            - libhipcub-devel
+            - libhipblas-common-devel
+            - libhipblas-devel
+            - libhipblaslt-devel
+            - libhipfft-devel
+            - libhipsparse-devel
+            - libhipsolver-devel
+            - libhiprand-devel
+            - libmiopen-hip-devel
         - libjpeg-turbo
         - libpng
         - libwebp
