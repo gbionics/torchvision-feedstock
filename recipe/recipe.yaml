@@ -35,6 +35,7 @@ outputs:
       name: torchvision
     build:
       script:
+        file: build
         env:
           BUILD_VERSION: ${{ version }}
     requirements:
